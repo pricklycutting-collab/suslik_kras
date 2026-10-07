@@ -33,8 +33,30 @@ let records = new Map(),
   introSeen = Boolean(readSetting("story-intro"));
 const playDialogue = createDialogue($("#dialogue"));
 const paintCity = createCity($("#city"), (p) => meetGuardian(p));
+function closeGamePanels() {
+  for (const id of ["#journal", "#album-panel", "#quest-panel"])
+    if ($(id).open) $(id).close();
+}
+function openGamePanel(id) {
+  if (busy) {
+    toast("Дождитесь сохранения фото.");
+    return;
+  }
+  closeGamePanels();
+  $(id).showModal();
+}
+$("#collection-open").onclick = () => openGamePanel("#journal");
+$("#album-open").onclick = () => openGamePanel("#album-panel");
+$("#quest-open").onclick = () => openGamePanel("#quest-panel");
+$("#map-open").onclick = () => {
+  closeGamePanels();
+  $("#city-scroll").dispatchEvent(new Event("world-reset"));
+};
+$("#story-replay").onclick = () => playIntro();
+$("#team-edit-info").onclick = () => showWelcome();
 async function playIntro() {
   if (busy) return false;
+  closeGamePanels();
   const completed = await playDialogue(introduction(team), {
     completeLabel: "Выбрать хранителя в городе",
   });
@@ -51,6 +73,7 @@ async function meetGuardian(point) {
     toast("Дождитесь сохранения фото.");
     return;
   }
+  closeGamePanels();
   if (!introSeen && records.size === 0 && !(await playIntro())) return;
   const rescued = records.has(point.id);
   const completed = await playDialogue(guardianDialogue(point.id, rescued), {
@@ -150,15 +173,16 @@ function render() {
   );
   $("#city-weather").textContent =
     count === 24
-      ? "Ясно. Все друзья дома"
+      ? "Все хранители спасены"
       : count >= 12
         ? "Туман почти рассеялся"
         : count >= 5
-          ? "Зажигаются первые окна"
-          : "Туман над городом";
+          ? "Город вспоминает себя"
+          : "Выберите суслика на карте";
   paintCity(records);
-  $("#story-start").textContent =
-    introSeen || count > 0 ? "Послушать завязку ещё раз" : "Начать историю ✦";
+  $("#story-start").title =
+    introSeen || count > 0 ? "Послушать завязку ещё раз" : "Начать историю";
+  $("#story-start").setAttribute("aria-label", $("#story-start").title);
   const search = $("#search")
     .value.trim()
     .toLocaleLowerCase("ru")
@@ -231,6 +255,7 @@ function openDetail(p) {
     toast("Дождитесь сохранения — это займёт немного времени.");
     return;
   }
+  closeGamePanels();
   clearPreview();
   selected = p;
   const visit = records.get(p.id);
@@ -381,6 +406,7 @@ async function removeVisit(point) {
 }
 function showWelcome() {
   if (busy) return;
+  closeGamePanels();
   $("#team-name").value = team;
   $("#welcome").showModal();
 }

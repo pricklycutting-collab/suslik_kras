@@ -14,77 +14,79 @@
     <title>Суслики · Хранители Красноярска</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <a class="skip" href="#collection">К коллекции</a>
-    <header>
-      <a class="brand" href="#">✦ СУСЛИКИ<span>ХРАНИТЕЛИ КРАСНОЯРСКА</span></a
-      ><button class="badge" id="help-open">Как играть?</button>
-    </header>
-    <div id="offline" role="status" hidden>
-      Вы офлайн. Коллекция и фото доступны; для внешних карт нужен интернет.
-    </div>
-    <main>
-      <section class="hero world-hero" id="world">
-        <div class="hero-copy">
-          <div>
-            <div class="eyebrow">ВАША СЕМЬЯ · ВАШЕ ПРИКЛЮЧЕНИЕ</div>
-            <h1>Красноярск ждёт своих хранителей.</h1>
-            <p>
-              Выберите точку в городе, поговорите с сусликом и помогите ему
-              выбраться из тумана.
-            </p>
-          </div>
-          <div class="world-actions">
-            <button class="button" id="story-start">Начать историю ✦</button
-            ><a class="text-button" href="#collection"
-              >Открыть всех хранителей</a
-            >
-          </div>
-        </div>
-        <div class="city-wrap">
-          <div class="city-label">
-            <span>КРАСНОЯРСК · ГОРОД ВОСПОМИНАНИЙ</span
-            ><span id="city-weather">Туман над городом</span>
-          </div>
-          <div class="city-scroll" id="city-scroll">
-            <div id="city" class="city" role="group"></div>
-          </div>
-          <div class="world-legend">
-            <span><i class="legend-dot"></i>В тумане</span
-            ><span><i class="legend-dot rescued"></i>Спасён</span
-            ><span class="pan-hint">↔ Листайте панораму</span>
-          </div>
-          <p class="city-caption">
-            Нажмите на точку, чтобы поговорить. Это художественный мир игры —
-            настоящие координаты и карты находятся в карточке хранителя.
-          </p>
-        </div>
-      </section>
-      <section class="journey">
-        <div>
-          <span class="eyebrow"
-            >ВАША ИСТОРИЯ ·
-            <span id="team-label">КОМАНДА ХРАНИТЕЛЕЙ</span></span
+  <body class="game-mode">
+    <a class="skip" href="#map-open">К управлению игрой</a>
+    <main id="world" class="game-world">
+      <div
+        class="city-scroll"
+        id="city-scroll"
+        tabindex="0"
+        aria-label="Игровая карта. Двигайте её пальцем или стрелками клавиатуры."
+      >
+        <div id="city" class="city" role="group"></div>
+      </div>
+      <header class="game-hud">
+        <button
+          class="hud-score pixel-panel"
+          id="quest-open"
+          aria-label="Прогресс и награды"
+        >
+          <img src="assets/map-suslik.png" alt="" /><span
+            ><span class="score-caption">Спасено</span
+            ><strong id="counter" aria-live="polite">0 / 24</strong></span
           >
-          <h2 id="story-title">Первые огоньки</h2>
-          <p id="story">
-            Для первой победы найдите любых пять сусликов. Можно гулять в своём
-            темпе и продолжить в другой день.
-          </p>
-          <div id="badges" class="earned" aria-label="Награды команды"></div>
+        </button>
+        <div class="hud-title">
+          <h1>СПАСЕНИЕ СУСЛИКОВ: КРАСНОЯРСК</h1>
+          <p>Найди и спаси всех хранителей</p>
         </div>
-        <div class="progress-box">
-          <strong id="counter">0 / 24</strong
-          ><span id="chapter-counter">До первой победы — 5 встреч</span
-          ><progress
-            id="progress"
-            value="0"
-            max="24"
-            aria-label="Прогресс коллекции"
-          ></progress
-          ><small id="percent">Приключение начинается!</small>
-        </div>
-      </section>
+        <nav class="hud-nav" aria-label="Игровое меню">
+          <button class="pixel-panel" id="map-open">
+            <img src="assets/menu-map.svg" alt="" />Карта</button
+          ><button class="pixel-panel" id="collection-open">
+            <img src="assets/map-suslik.png" alt="" />Суслики</button
+          ><button class="pixel-panel" id="story-start">
+            <img src="assets/menu-home.svg" alt="" /><span class="nav-caption"
+              >Старт</span
+            >
+          </button>
+        </nav>
+      </header>
+      <div id="offline" role="status" hidden>
+        Нет сети · игра и альбом доступны
+      </div>
+      <div class="map-status pixel-panel">
+        <span class="status-light" aria-hidden="true"></span
+        ><span id="city-weather">Выберите хранителя</span>
+      </div>
+      <div class="camera-controls" role="group" aria-label="Управление картой">
+        <button class="pixel-panel" id="zoom-out" aria-label="Отдалить карту">
+          −</button
+        ><button class="pixel-panel" id="zoom-in" aria-label="Приблизить карту">
+          +</button
+        ><button
+          class="pixel-panel"
+          id="map-center"
+          aria-label="Вернуться к центру карты"
+        >
+          ⌖</button
+        ><button
+          class="pixel-panel album-open"
+          id="album-open"
+          aria-label="Открыть семейный альбом"
+        >
+          ▤
+        </button>
+      </div>
+      <p class="map-hint">Двигайте карту · нажмите на суслика</p>
+    </main>
+    <dialog id="journal" class="game-panel" aria-labelledby="journal-title">
+      <button class="close" aria-label="Закрыть коллекцию">×</button>
+      <div class="panel-heading">
+        <span class="eyebrow">ВАШ ОТРЯД</span>
+        <h2 id="journal-title">Хранители Красноярска</h2>
+        <p>Выберите друга — он расскажет свою историю.</p>
+      </div>
       <section id="collection">
         <div class="section-heading">
           <div>
@@ -126,6 +128,10 @@
           Здесь пока никого. Попробуйте другую подборку, поиск или фильтр.
         </p>
       </section>
+    </dialog>
+    <dialog id="album-panel" class="game-panel" aria-labelledby="album-title">
+      <button class="close" aria-label="Закрыть альбом">×</button>
+      <h2 id="album-title">Альбом приключений</h2>
       <section class="album" id="album">
         <div>
           <span class="eyebrow">СОХРАНИТЕ ВАШИ ВСТРЕЧИ</span>
@@ -157,49 +163,53 @@
           Здесь появятся ваши фото после первой встречи.
         </p>
       </section>
-      <section class="how">
-        <h2>Маленькие шаги. Большая история.</h2>
+      <div class="panel-links">
+        <button class="text-button" id="team-edit-info">
+          Правила и команда</button
+        ><button class="text-button" id="install-help">
+          Добавить игру на главный экран
+        </button>
+      </div>
+      <p class="fine">
+        Фото остаются в браузере. Игровая карта художественная; реальные
+        координаты — в карточках. Сюжет вымышленный.
+      </p>
+    </dialog>
+    <dialog
+      id="quest-panel"
+      class="game-panel quest-panel"
+      aria-labelledby="quest-title"
+    >
+      <button class="close" aria-label="Закрыть награды">×</button
+      ><span class="eyebrow">ДНЕВНИК ПРИКЛЮЧЕНИЯ</span>
+      <h2 id="quest-title">Как идёт спасение?</h2>
+      <section class="journey">
         <div>
-          <article>
-            <b>01</b>
-            <h3>Найдите хранителя</h3>
-            <p>
-              Выберите точку и проверьте путь в картах. Идите в удобном темпе, с
-              остановками на отдых.
-            </p>
-          </article>
-          <article>
-            <b>02</b>
-            <h3>Выполните задание вместе</h3>
-            <p>
-              Посмотрите на детали скульптуры, придумайте историю или найдите
-              краски города.
-            </p>
-          </article>
-          <article>
-            <b>03</b>
-            <h3>Добавьте фото</h3>
-            <p>
-              Сохраните встречу в альбоме. Один хранитель — одна искра света в
-              вашем городе.
-            </p>
-          </article>
+          <span class="eyebrow"
+            >ВАША ИСТОРИЯ ·
+            <span id="team-label">КОМАНДА ХРАНИТЕЛЕЙ</span></span
+          >
+          <h2 id="story-title">Первые огоньки</h2>
+          <p id="story">
+            Для первой победы найдите любых пять сусликов. Можно гулять в своём
+            темпе и продолжить в другой день.
+          </p>
+          <div id="badges" class="earned" aria-label="Награды команды"></div>
+        </div>
+        <div class="progress-box">
+          <span id="chapter-counter">До первой победы — 5 встреч</span
+          ><progress
+            id="progress"
+            value="0"
+            max="24"
+            aria-label="Прогресс коллекции"
+          ></progress
+          ><small id="percent">Приключение начинается!</small>
         </div>
       </section>
-    </main>
-    <footer>
-      Сделано для неспешных прогулок и любопытных сердец.<br /><small
-        >MVP · Фото не отправляются на сервер. Геолокация не проверяется. Это
-        художественный квест; исторические справки ещё готовятся.</small
-      ><br /><button class="text-button" id="install-help">
-        Как добавить на главный экран
-      </button>
-    </footer>
-    <nav class="bottom-nav" aria-label="Разделы игры">
-      <a href="#">▦ <span>Город</span></a
-      ><a href="#collection">✦ <span>Хранители</span></a
-      ><a href="#album">▤ <span>Альбом</span></a>
-    </nav>
+      <button class="button" id="help-open">Правила и название команды</button
+      ><button class="secondary" id="story-replay">Послушать завязку</button>
+    </dialog>
     <dialog id="detail" aria-labelledby="detail-title">
       <button class="close" aria-label="Закрыть">×</button>
       <div id="detail-content"></div>

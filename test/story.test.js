@@ -6,7 +6,7 @@ import {
   guardianDialogue,
   rescueDialogue,
 } from "../story.js";
-import { scenePositions } from "../city.js";
+import { scenePositions, worldSize } from "../city.js";
 import { locations } from "../locations.js";
 import { missions } from "../game.js";
 test("all 24 guardians have personal dialogue, alternative replies, task and rescued state", () => {
@@ -49,13 +49,31 @@ test("every scene point is reachable and separated at the mobile panorama size",
     assert.ok(x > 4 && x < 96);
     assert.ok(y > 5 && y < 95);
   }
+  const size = worldSize(320, 480);
   for (let i = 0; i < scenePositions.length; i++)
     for (let j = i + 1; j < scenePositions.length; j++) {
       const [x1, y1] = scenePositions[i],
         [x2, y2] = scenePositions[j];
       assert.ok(
-        Math.abs(x1 - x2) * 7.2 > 44 || Math.abs(y1 - y2) * 4.8 > 48,
+        (Math.abs(x1 - x2) * size.width) / 100 > 48 ||
+          (Math.abs(y1 - y2) * size.height) / 100 > 66,
         `overlapping markers ${i}/${j}`,
       );
     }
+});
+
+test("camera fills portrait and landscape viewports and clamps zoom", () => {
+  for (const [w, h] of [
+    [320, 720],
+    [390, 844],
+    [1440, 1000],
+    [800, 400],
+  ]) {
+    const base = worldSize(w, h),
+      zoomed = worldSize(w, h, 2);
+    assert.ok(base.width >= w && base.height >= h);
+    assert.ok(zoomed.width > base.width && zoomed.height > base.height);
+    assert.deepEqual(worldSize(w, h, 0), base);
+    assert.deepEqual(worldSize(w, h, 20), worldSize(w, h, 2.5));
+  }
 });

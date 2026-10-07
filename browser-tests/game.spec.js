@@ -10,7 +10,21 @@ async function start(page) {
   await expect(page.locator("#dialogue")).not.toBeVisible();
   await expect(page.locator(".card")).toHaveCount(24);
 }
+async function collection(page) {
+  for (const id of ["#album-panel", "#quest-panel"])
+    if (await page.locator(id).isVisible())
+      await page.locator(id + " .close").click();
+  if (!(await page.locator("#journal").isVisible()))
+    await page.locator("#collection-open").click();
+}
+async function album(page) {
+  if (await page.locator("#journal").isVisible())
+    await page.locator("#journal .close").click();
+  if (!(await page.locator("#album-panel").isVisible()))
+    await page.locator("#album-open").click();
+}
 async function card(page, id) {
+  await collection(page);
   const target =
     id === undefined
       ? page.locator(".card").first()
@@ -49,17 +63,21 @@ test("mobile onboarding, artwork, search, selection and city buttons", async ({
     ),
   ).toBe(true);
   await expect(page.locator(".card .sprite")).toHaveCount(24);
+  await collection(page);
   await page.locator("#search").fill("поваренок");
   await expect(page.locator(".card")).toHaveCount(1);
   await page.locator("#search").fill("");
   await page.locator("#walk").selectOption("center");
   await expect(page.locator(".card")).toHaveCount(5);
+  await page.locator("#journal .close").click();
   await page.locator(".city-point").first().click();
   await expect(page.locator("#dialogue-speaker")).toHaveText("айтишник");
   await page.locator("#dialogue-skip").click();
   await expect(page.locator("#detail-title")).toHaveText("айтишник");
   await page.locator("#detail .close").click();
+  await collection(page);
   await page.locator("#walk").selectOption("all");
+  await page.locator("#journal .close").click();
   await page.screenshot({ path: "test-results/mobile.png", fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   expect(
@@ -98,6 +116,7 @@ test("mission and photo validation, persistence, replacement and confirmed remov
   await page.reload();
   await expect(page.locator("#counter")).toHaveText("1 / 24");
   await expect(page.locator("#welcome")).not.toBeVisible();
+  await collection(page);
   await page.locator('[data-filter="done"]').click();
   await expect(page.locator(".card")).toHaveCount(1);
   await visit(page, 0, photo);
@@ -121,6 +140,7 @@ test("first victory, backup export, rejected import and restoration retain photo
   await expect(page.locator("#counter")).toHaveText("5 / 24");
   await expect(page.locator(".earned .unlocked")).toHaveCount(1);
   await expect(page.locator("#story-title")).toHaveText("Город добрых встреч");
+  await album(page);
   const downloadPromise = page.waitForEvent("download");
   await page.locator("#export").click();
   const download = await downloadPromise;
@@ -149,6 +169,7 @@ test("first victory, backup export, rejected import and restoration retain photo
     .click();
   await expect(page.locator("#counter")).toHaveText("4 / 24");
   await page.locator("#detail .close").click();
+  await album(page);
   await page.locator("#import").setInputFiles({
     name: "backup.json",
     mimeType: "application/json",
@@ -184,7 +205,7 @@ test("cached subdirectory deployment works offline including photos and artwork"
   expect(
     await page
       .locator(".city-art")
-      .evaluate((img) => img.complete && img.naturalWidth === 1536),
+      .evaluate((img) => img.complete && img.naturalWidth === 1672),
   ).toBe(true);
   await expect(page.locator(".card")).toHaveCount(24);
   await card(page, 10);
@@ -229,7 +250,7 @@ test("full finale and migration of original IndexedDB visits", async ({
     "Красноярск снова сияет",
   );
   await expect(page.locator(".city-point.found")).toHaveCount(24);
-  await expect(page.locator(".city-resident")).toHaveCount(3);
+  await expect(page.locator(".city-point.found .world-suslik")).toHaveCount(24);
   await expect(page.locator(".earned .unlocked")).toHaveCount(3);
 });
 test("unavailable local storage still leaves catalog usable and never claims to save", async ({
@@ -254,4 +275,43 @@ test("unavailable local storage still leaves catalog usable and never claims to 
   await card(page);
   await expect(page.locator("#save")).toBeDisabled();
   await expect(page.locator("#message")).toContainText("недоступно");
+});
+
+test("fullscreen world camera supports zoom, dragging and game panels", async ({
+  page,
+}) => {
+  await start(page);
+  await expect(page.locator(".hud-nav")).toBeVisible();
+  await expect(page.locator(".world-suslik")).toHaveCount(24);
+  const width = await page.locator("#city").evaluate((e) => e.clientWidth);
+  await page.locator("#zoom-in").click();
+  expect(
+    await page.locator("#city").evaluate((e) => e.clientWidth),
+  ).toBeGreaterThan(width);
+  await page.locator("#map-center").click();
+  expect(await page.locator("#city").evaluate((e) => e.clientWidth)).toBe(
+    width,
+  );
+  const left = await page.locator("#city-scroll").evaluate((e) => e.scrollLeft);
+  await page.mouse.move(200, 350);
+  await page.mouse.down();
+  await page.mouse.move(100, 385, { steps: 8 });
+  await page.mouse.up();
+  expect(
+    await page.locator("#city-scroll").evaluate((e) => e.scrollLeft),
+  ).toBeGreaterThan(left);
+  await page.locator("#quest-open").click();
+  await expect(page.locator("#quest-panel")).toBeVisible();
+  await page.locator("#quest-panel .close").click();
+  await album(page);
+  await expect(page.locator("#album-panel")).toBeVisible();
+  await page.locator("#album-panel .close").click();
+  await page.setViewportSize({ width: 800, height: 400 });
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth <= innerWidth &&
+        document.documentElement.scrollHeight <= innerHeight,
+    ),
+  ).toBe(true);
 });
