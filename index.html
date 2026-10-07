@@ -1,8 +1,238 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#244b3e"><title>Суслики · Хранители Красноярска</title><link rel="stylesheet" href="style.css"></head><body>
-<header><a class="brand" href="#">✦ СУСЛИКИ<span>ХРАНИТЕЛИ КРАСНОЯРСКА</span></a><span class="badge">СЕМЕЙНЫЙ КВЕСТ</span></header>
-<main><section class="hero"><div class="eyebrow">БОЛЬШОЕ ПРИКЛЮЧЕНИЕ МАЛЕНЬКИХ ГЕРОЕВ</div><h1>Город полон<br>маленьких чудес.</h1><p>Прогуляйтесь по Красноярску, найдите бронзовых сусликов и помогите им прогнать Туман Забывайку.</p><a class="button" href="#collection">Отправиться в путь <span>↗</span></a><div class="scene" aria-hidden="true"><div class="sun"></div><div class="mountains"></div><div class="river"></div><div class="pixel-suslik">🐿️</div><span class="scene-label">КРАСНОЯРСК · 24 ХРАНИТЕЛЯ</span></div></section>
-<section class="journey"><div><span class="eyebrow">ВАША ИСТОРИЯ</span><h2 id="story-title">Вернём городу краски</h2><p id="story">Туман спрятал городские воспоминания. Каждая встреча с сусликом возвращает немного света.</p></div><div class="progress-box"><strong id="counter">0 / 24</strong><span>хранителей найдено</span><progress id="progress" value="0" max="24"></progress><small id="percent">Приключение начинается!</small></div></section>
-<section id="collection"><div class="section-heading"><div><span class="eyebrow">ВСТРЕЧИ ПО ДОРОГЕ</span><h2>Ваши маленькие хранители</h2></div><span id="total">24 места</span></div><div class="controls"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Найти суслика" aria-label="Поиск суслика"></label><div class="filters" role="group" aria-label="Фильтр коллекции"><button class="active" data-filter="all" aria-pressed="true">Все</button><button data-filter="todo" aria-pressed="false">Впереди</button><button data-filter="done" aria-pressed="false">Найдены</button></div></div><div id="cards" class="cards"></div><p id="empty" hidden>Здесь пока никого. Попробуйте другой поиск или фильтр.</p></section>
-<section class="how"><h2>Маленькие шаги. Большая история.</h2><div><article><b>01</b><h3>Выберите хранителя</h3><p>Откройте его точку на карте и спланируйте прогулку со взрослыми.</p></article><article><b>02</b><h3>Встретьтесь и сфотографируйте</h3><p>Найдите статую и сделайте памятный снимок. Бережно относитесь к скульптуре.</p></article><article><b>03</b><h3>Верните частичку света</h3><p>Добавьте фото в коллекцию и продолжайте приключение в своём темпе.</p></article></div></section>
-</main><footer>Сделано для неспешных прогулок и любопытных сердец.<br><small>Прототип · фото и прогресс хранятся только в этом браузере. Очистка данных браузера удалит коллекцию.</small></footer>
-<dialog id="detail"><button class="close" aria-label="Закрыть">×</button><div id="detail-content"></div><p id="message" role="status"></p></dialog><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#244b3e" />
+    <meta
+      name="description"
+      content="Семейный квест по 24 бронзовым сусликам Красноярска. Находите хранителей, собирайте фото и возвращайте городу свет."
+    />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <title>Суслики · Хранители Красноярска</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#collection">К коллекции</a>
+    <header>
+      <a class="brand" href="#">✦ СУСЛИКИ<span>ХРАНИТЕЛИ КРАСНОЯРСКА</span></a
+      ><button class="badge" id="help-open">Как играть?</button>
+    </header>
+    <div id="offline" role="status" hidden>
+      Вы офлайн. Коллекция и фото доступны; для внешних карт нужен интернет.
+    </div>
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">ПРОГУЛКА, КОТОРАЯ СТАНЕТ ИСТОРИЕЙ</div>
+          <h1>Разбудите<br />маленький город.</h1>
+          <p>
+            Туман Забывайка перепутал воспоминания Красноярска. Найдите
+            бронзовых сусликов — и помогите городу снова засиять.
+          </p>
+          <a class="button" href="#collection"
+            >Выбрать первого хранителя <span>↗</span></a
+          >
+          <div class="hero-notes">
+            <span>24 встречи</span><span>Первая победа — за 5</span
+            ><span>Без регистрации</span>
+          </div>
+        </div>
+        <div class="city-wrap">
+          <div class="city-label">
+            <span>ВАШ КРАСНОЯРСК</span
+            ><span id="city-weather">Туман над городом</span>
+          </div>
+          <div id="city" class="city" role="group"></div>
+          <p class="city-caption">
+            Каждая встреча зажигает окна. Нажмите на номер домика, чтобы
+            познакомиться с хранителем. Сцена не является картой.
+          </p>
+        </div>
+      </section>
+      <section class="journey">
+        <div>
+          <span class="eyebrow"
+            >ВАША ИСТОРИЯ ·
+            <span id="team-label">КОМАНДА ХРАНИТЕЛЕЙ</span></span
+          >
+          <h2 id="story-title">Первые огоньки</h2>
+          <p id="story">
+            Для первой победы найдите любых пять сусликов. Можно гулять в своём
+            темпе и продолжить в другой день.
+          </p>
+          <div id="badges" class="earned" aria-label="Награды команды"></div>
+        </div>
+        <div class="progress-box">
+          <strong id="counter">0 / 24</strong
+          ><span id="chapter-counter">До первой победы — 5 встреч</span
+          ><progress
+            id="progress"
+            value="0"
+            max="24"
+            aria-label="Прогресс коллекции"
+          ></progress
+          ><small id="percent">Приключение начинается!</small>
+        </div>
+      </section>
+      <section id="collection">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">БРОНЗОВЫЕ СТАТУИ → ВАШИ ГЕРОИ</span>
+            <h2>Познакомьтесь с хранителями</h2>
+          </div>
+          <span id="total">24 места</span>
+        </div>
+        <label class="walk-label"
+          >Подборка для прогулки<select id="walk">
+            <option value="all">Все хранители</option>
+            <option value="center">Начать в центре · 5 точек</option>
+            <option value="creative">Книги и краски · 4 точки</option>
+            <option value="adventure">Большое приключение · 5 точек</option>
+          </select></label
+        >
+        <p class="walk-note" id="walk-note">
+          Координаты предоставлены автором проекта. Проверяйте пешеходный путь в
+          картах: подборки не являются проверенными маршрутами.
+        </p>
+        <div class="controls">
+          <label class="search"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              id="search"
+              type="search"
+              placeholder="Найти суслика"
+              aria-label="Поиск суслика"
+          /></label>
+          <div class="filters" role="group" aria-label="Фильтр коллекции">
+            <button class="active" data-filter="all" aria-pressed="true">
+              Все</button
+            ><button data-filter="todo" aria-pressed="false">Впереди</button
+            ><button data-filter="done" aria-pressed="false">Найдены</button>
+          </div>
+        </div>
+        <div id="cards" class="cards"></div>
+        <p id="empty" hidden>
+          Здесь пока никого. Попробуйте другую подборку, поиск или фильтр.
+        </p>
+      </section>
+      <section class="album" id="album">
+        <div>
+          <span class="eyebrow">СОХРАНИТЕ ВАШИ ВСТРЕЧИ</span>
+          <h2>Семейный альбом</h2>
+          <p>
+            Фото остаются на вашем устройстве. Скачайте резервную копию, чтобы
+            не потерять коллекцию при очистке браузера или перенести её на
+            другой телефон.
+          </p>
+        </div>
+        <div class="album-actions">
+          <button class="button" id="export">Скачать копию альбома ↓</button
+          ><label class="secondary file-button"
+            >Восстановить из копии<input
+              id="import"
+              type="file"
+              accept="application/json,.json" /></label
+          ><button class="text-button" id="team-edit">Название команды</button
+          ><button class="secondary" id="install" hidden>
+            Установить игру
+          </button>
+        </div>
+        <div
+          id="album-photos"
+          class="album-photos"
+          aria-label="Фотографии вашей команды"
+        ></div>
+        <p id="album-empty" class="fine">
+          Здесь появятся ваши фото после первой встречи.
+        </p>
+      </section>
+      <section class="how">
+        <h2>Маленькие шаги. Большая история.</h2>
+        <div>
+          <article>
+            <b>01</b>
+            <h3>Найдите хранителя</h3>
+            <p>
+              Выберите точку и проверьте путь в картах. Идите в удобном темпе, с
+              остановками на отдых.
+            </p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>Выполните задание вместе</h3>
+            <p>
+              Посмотрите на детали скульптуры, придумайте историю или найдите
+              краски города.
+            </p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>Добавьте фото</h3>
+            <p>
+              Сохраните встречу в альбоме. Один хранитель — одна искра света в
+              вашем городе.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <footer>
+      Сделано для неспешных прогулок и любопытных сердец.<br /><small
+        >MVP · Фото не отправляются на сервер. Геолокация не проверяется. Это
+        художественный квест; исторические справки ещё готовятся.</small
+      ><br /><button class="text-button" id="install-help">
+        Как добавить на главный экран
+      </button>
+    </footer>
+    <nav class="bottom-nav" aria-label="Разделы игры">
+      <a href="#">▦ <span>Город</span></a
+      ><a href="#collection">✦ <span>Хранители</span></a
+      ><a href="#album">▤ <span>Альбом</span></a>
+    </nav>
+    <dialog id="detail" aria-labelledby="detail-title">
+      <button class="close" aria-label="Закрыть">×</button>
+      <div id="detail-content"></div>
+      <p id="message" role="status"></p>
+    </dialog>
+    <dialog id="welcome" aria-labelledby="welcome-title">
+      <button class="close" aria-label="Закрыть">×</button
+      ><span class="eyebrow">ДОБРО ПОЖАЛОВАТЬ В ПРИКЛЮЧЕНИЕ</span>
+      <h2 id="welcome-title">У города есть маленькие хранители</h2>
+      <p>
+        Забывайка потерял собственные воспоминания и окутал город туманом.
+        Соберите альбом встреч, чтобы напомнить ему, сколько здесь доброго.
+      </p>
+      <ol>
+        <li>Выберите суслика и откройте его точку в картах.</li>
+        <li>Найдите статую, выполните семейное задание.</li>
+        <li>Добавьте фото — город получит ещё одну искру света.</li>
+      </ol>
+      <p>
+        Первые <strong>5 встреч</strong> — ваша первая победа. Все
+        <strong>24</strong> — большой финал!
+      </p>
+      <label class="team-input"
+        >Как зовут вашу команду?<input
+          id="team-name"
+          maxlength="40"
+          placeholder="Например, Енисейские следопыты"
+          autocomplete="off" /></label
+      ><button class="button" id="welcome-start">Начать приключение ✦</button>
+      <p class="fine">
+        Фото хранятся только в браузере. Скачивайте копию альбома. Во время
+        прогулки дети остаются со взрослыми; берегите скульптуры.
+      </p>
+    </dialog>
+    <dialog id="notice" aria-labelledby="notice-title">
+      <button class="close" aria-label="Закрыть">×</button>
+      <h2 id="notice-title"></h2>
+      <p id="notice-text"></p>
+      <div id="notice-actions" class="detail-actions"></div>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

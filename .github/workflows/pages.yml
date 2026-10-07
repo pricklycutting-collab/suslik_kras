@@ -1,0 +1,34 @@
+name: Publish game to GitHub Pages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: npm test
+      - uses: actions/configure-pages@v5
+      - name: Prepare public files
+        run: |
+          mkdir public
+          cp index.html style.css app.js locations.js game.js storage.js sprites.js city.js sw.js manifest.webmanifest connection.txt public/
+          cp -R assets public/assets
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
