@@ -1,5 +1,5 @@
 const PREFIX = "suslik-kras-" + new URL(self.registration.scope).pathname;
-const CACHE = PREFIX + "mvp-1";
+const CACHE = PREFIX + "story-2";
 const FILES = [
   "./",
   "index.html",
@@ -10,6 +10,9 @@ const FILES = [
   "storage.js",
   "sprites.js",
   "city.js",
+  "story.js",
+  "dialogue.js",
+  "assets/krasnoyarsk-world.png",
   "manifest.webmanifest",
   "assets/icon.svg",
   "assets/icon-192.png",

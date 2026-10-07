@@ -5,17 +5,36 @@ async function start(page) {
   await expect(page.locator("#welcome")).toBeVisible();
   await page.locator("#team-name").fill("Енисейские следопыты");
   await page.locator("#welcome-start").click();
+  await expect(page.locator("#dialogue-speaker")).toHaveText("Рассказчик");
+  await page.locator("#dialogue-skip").click();
+  await expect(page.locator("#dialogue")).not.toBeVisible();
   await expect(page.locator(".card")).toHaveCount(24);
 }
+async function card(page, id) {
+  const target =
+    id === undefined
+      ? page.locator(".card").first()
+      : page.locator(`.card[data-id="${id}"]`);
+  await target.click();
+  await expect(page.locator("#dialogue")).toBeVisible();
+  await page.locator("#dialogue-skip").click();
+  await expect(page.locator("#detail")).toBeVisible();
+}
+async function saved(page) {
+  if (await page.locator("#dialogue").isVisible()) {
+    await page.locator("#dialogue-skip").click();
+    await expect(page.locator("#detail")).not.toBeVisible();
+  } else await page.locator("#detail .close").click();
+}
 async function visit(page, id, photo) {
-  await page.locator(`.card[data-id="${id}"]`).click();
+  await card(page, id);
   await page.locator("#mission-done").check();
   await page
     .locator("#photo")
     .setInputFiles({ name: "visit.png", mimeType: "image/png", buffer: photo });
   await page.locator("#save").click();
   await expect(page.locator("#message")).toContainText("сохранены");
-  await page.locator("#detail .close").click();
+  await saved(page);
 }
 test("mobile onboarding, artwork, search, selection and city buttons", async ({
   page,
@@ -36,6 +55,8 @@ test("mobile onboarding, artwork, search, selection and city buttons", async ({
   await page.locator("#walk").selectOption("center");
   await expect(page.locator(".card")).toHaveCount(5);
   await page.locator(".city-point").first().click();
+  await expect(page.locator("#dialogue-speaker")).toHaveText("айтишник");
+  await page.locator("#dialogue-skip").click();
   await expect(page.locator("#detail-title")).toHaveText("айтишник");
   await page.locator("#detail .close").click();
   await page.locator("#walk").selectOption("all");
@@ -54,7 +75,7 @@ test("mission and photo validation, persistence, replacement and confirmed remov
 }) => {
   await start(page);
   const photo = await page.screenshot();
-  await page.locator(".card").first().click();
+  await card(page);
   await page.locator("#save").click();
   await expect(page.locator("#message")).toContainText("задание");
   await page.locator("#mission-done").check();
@@ -73,7 +94,7 @@ test("mission and photo validation, persistence, replacement and confirmed remov
     .setInputFiles({ name: "test.png", mimeType: "image/png", buffer: photo });
   await page.locator("#save").click();
   await expect(page.locator("#message")).toContainText("сохранены");
-  await page.locator("#detail .close").click();
+  await saved(page);
   await page.reload();
   await expect(page.locator("#counter")).toHaveText("1 / 24");
   await expect(page.locator("#welcome")).not.toBeVisible();
@@ -81,7 +102,7 @@ test("mission and photo validation, persistence, replacement and confirmed remov
   await expect(page.locator(".card")).toHaveCount(1);
   await visit(page, 0, photo);
   await expect(page.locator("#counter")).toHaveText("1 / 24");
-  await page.locator(".card").click();
+  await card(page, 0);
   await page.locator("#remove").click();
   await page.getByRole("button", { name: "Оставить", exact: true }).click();
   await expect(page.locator("#counter")).toHaveText("1 / 24");
@@ -121,7 +142,7 @@ test("first victory, backup export, rejected import and restoration retain photo
   );
   await page.getByRole("button", { name: "Понятно", exact: true }).click();
   await expect(page.locator("#counter")).toHaveText("5 / 24");
-  await page.locator(".card").first().click();
+  await card(page);
   await page.locator("#remove").click();
   await page
     .getByRole("button", { name: "Убрать встречу", exact: true })
@@ -137,7 +158,7 @@ test("first victory, backup export, rejected import and restoration retain photo
   await expect(page.locator("#counter")).toHaveText("5 / 24");
   await page.reload();
   await expect(page.locator("#counter")).toHaveText("5 / 24");
-  await page.locator(".card").first().click();
+  await card(page);
   await expect(page.locator(".detail-photo")).toBeVisible();
 });
 test("cached subdirectory deployment works offline including photos and artwork", async ({
@@ -160,8 +181,13 @@ test("cached subdirectory deployment works offline including photos and artwork"
   await page.reload();
   await expect(page.locator("#counter")).toHaveText("1 / 24");
   await expect(page.locator("#offline")).toBeVisible();
+  expect(
+    await page
+      .locator(".city-art")
+      .evaluate((img) => img.complete && img.naturalWidth === 1536),
+  ).toBe(true);
   await expect(page.locator(".card")).toHaveCount(24);
-  await page.locator('.card[data-id="10"]').click();
+  await card(page, 10);
   await expect(page.locator(".detail-photo")).toBeVisible();
   expect(
     await page
@@ -223,7 +249,9 @@ test("unavailable local storage still leaves catalog usable and never claims to 
   });
   await page.goto("./");
   await expect(page.locator(".card")).toHaveCount(24);
-  await page.locator(".card").first().click();
+  await page.locator("#story-start").click();
+  await page.locator("#dialogue-skip").click();
+  await card(page);
   await expect(page.locator("#save")).toBeDisabled();
   await expect(page.locator("#message")).toContainText("недоступно");
 });

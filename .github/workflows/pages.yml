@@ -24,7 +24,7 @@ jobs:
       - name: Prepare public files
         run: |
           mkdir public
-          cp index.html style.css app.js locations.js game.js storage.js sprites.js city.js sw.js manifest.webmanifest connection.txt public/
+          cp index.html style.css app.js locations.js game.js storage.js sprites.js city.js story.js dialogue.js sw.js manifest.webmanifest connection.txt public/
           cp -R assets public/assets
       - uses: actions/upload-pages-artifact@v3
         with:

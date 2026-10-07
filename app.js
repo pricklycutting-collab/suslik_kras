@@ -18,6 +18,8 @@ import {
 } from "./storage.js";
 import { sprite } from "./sprites.js";
 import { createCity } from "./city.js";
+import { introduction, guardianDialogue, rescueDialogue } from "./story.js";
+import { createDialogue } from "./dialogue.js";
 const $ = (s) => document.querySelector(s);
 let records = new Map(),
   filter = "all",
@@ -27,8 +29,38 @@ let records = new Map(),
   team = readSetting("team"),
   installPrompt = null,
   toastTimer,
-  previewUrl;
-const paintCity = createCity($("#city"), (p) => openDetail(p));
+  previewUrl,
+  introSeen = Boolean(readSetting("story-intro"));
+const playDialogue = createDialogue($("#dialogue"));
+const paintCity = createCity($("#city"), (p) => meetGuardian(p));
+async function playIntro() {
+  if (busy) return false;
+  const completed = await playDialogue(introduction(team), {
+    completeLabel: "Выбрать хранителя в городе",
+  });
+  if (completed) {
+    introSeen = true;
+    saveSetting("story-intro", "yes");
+    render();
+    $("#world").scrollIntoView({ block: "start" });
+  }
+  return completed;
+}
+async function meetGuardian(point) {
+  if (busy) {
+    toast("Дождитесь сохранения фото.");
+    return;
+  }
+  if (!introSeen && records.size === 0 && !(await playIntro())) return;
+  const rescued = records.has(point.id);
+  const completed = await playDialogue(guardianDialogue(point.id, rescued), {
+    completeLabel: rescued
+      ? "Посмотреть нашу встречу"
+      : "К заданию и месту встречи",
+  });
+  if (completed) openDetail(point);
+}
+$("#story-start").onclick = playIntro;
 function toast(text) {
   clearTimeout(toastTimer);
   $("#toast").textContent = text;
@@ -125,6 +157,8 @@ function render() {
           ? "Зажигаются первые окна"
           : "Туман над городом";
   paintCity(records);
+  $("#story-start").textContent =
+    introSeen || count > 0 ? "Послушать завязку ещё раз" : "Начать историю ✦";
   const search = $("#search")
     .value.trim()
     .toLocaleLowerCase("ru")
@@ -147,7 +181,7 @@ function render() {
       art.className = "art";
       const status = document.createElement("span");
       status.className = "status";
-      status.textContent = visit ? "✓ НАЙДЕН" : "✦ ХРАНИТЕЛЬ";
+      status.textContent = visit ? "✦ СПАСЁН" : "? В ТУМАНЕ";
       art.append(status);
       mountSprite(p.id, art);
       const body = document.createElement("div");
@@ -158,10 +192,10 @@ function render() {
       subtitle.textContent = `Место ${String(p.id + 1).padStart(2, "0")} · Красноярск`;
       const bottom = document.createElement("div");
       bottom.className = "card-bottom";
-      bottom.innerHTML = `<span>${visit ? "Фото в альбоме" : "Встретить хранителя"}</span><span aria-hidden="true">↗</span>`;
+      bottom.innerHTML = `<span>${visit ? "Поговорить с другом" : "Поговорить и помочь"}</span><span aria-hidden="true">↗</span>`;
       body.append(title, subtitle, bottom);
       button.append(art, body);
-      button.onclick = () => openDetail(p);
+      button.onclick = () => meetGuardian(p);
       return button;
     }),
   );
@@ -202,9 +236,15 @@ function openDetail(p) {
   const visit = records.get(p.id);
   $("#message").textContent = "";
   $("#detail-content").innerHTML =
-    `<div class="detail-hero"></div><span class="eyebrow">ХРАНИТЕЛЬ ${String(p.id + 1).padStart(2, "0")} / 24</span><h2 id="detail-title"></h2><p>Одна встреча — одна искра света. Рассмотрите настоящую скульптуру и создайте маленькое семейное воспоминание.</p><div class="mission"><span class="eyebrow">ЗАДАНИЕ ДЛЯ ВАШЕЙ КОМАНДЫ</span><p id="mission-text"></p><label><input id="mission-done" type="checkbox" ${visit ? "checked" : ""}>Мы выполнили задание вместе</label></div><p class="coordinates">${p.lat}, ${p.lon} · координаты автора проекта</p><div class="map-links"><a class="secondary" href="${navigationUrl(p)}" target="_blank" rel="noopener noreferrer">Яндекс Карты ↗</a><a class="secondary" href="https://2gis.ru/krasnoyarsk?m=${p.lon},${p.lat}/17" target="_blank" rel="noopener noreferrer">2ГИС ↗</a></div>${visit ? '<img class="detail-photo" alt="Ваш памятный снимок"><p class="seen-date"></p>' : ""}<div class="detail-actions"><label class="upload">${visit ? "Заменить памятное фото" : "Сделать или выбрать фото"}<input id="photo" type="file" accept="image/*"><img id="photo-preview" class="photo-preview" alt="Предпросмотр выбранного фото" hidden></label><button class="button" id="save">${visit ? "Сохранить новое фото" : "Мы нашли суслика! ✦"}</button>${visit ? '<button class="secondary" id="remove">Убрать отметку и фото</button>' : ""}</div><p class="fine">Можно выбрать фото или камеру через меню телефона. Геолокация не проверяется. Фото не отправляется на сервер.</p>`;
+    `<div class="detail-hero"></div><span class="eyebrow">ХРАНИТЕЛЬ ${String(p.id + 1).padStart(2, "0")} / 24</span><h2 id="detail-title"></h2><button id="talk-again" class="secondary talk-button">Поговорить с хранителем</button><p>Одна встреча — одна искра света. Рассмотрите настоящую скульптуру и создайте маленькое семейное воспоминание.</p><div class="mission"><span class="eyebrow">ЗАДАНИЕ ДЛЯ ВАШЕЙ КОМАНДЫ</span><p id="mission-text"></p><label><input id="mission-done" type="checkbox" ${visit ? "checked" : ""}>Мы выполнили задание вместе</label></div><p class="coordinates">${p.lat}, ${p.lon} · координаты автора проекта</p><div class="map-links"><a class="secondary" href="${navigationUrl(p)}" target="_blank" rel="noopener noreferrer">Яндекс Карты ↗</a><a class="secondary" href="https://2gis.ru/krasnoyarsk?m=${p.lon},${p.lat}/17" target="_blank" rel="noopener noreferrer">2ГИС ↗</a></div>${visit ? '<img class="detail-photo" alt="Ваш памятный снимок"><p class="seen-date"></p>' : ""}<div class="detail-actions"><label class="upload">${visit ? "Заменить памятное фото" : "Сделать или выбрать фото"}<input id="photo" type="file" accept="image/*"><img id="photo-preview" class="photo-preview" alt="Предпросмотр выбранного фото" hidden></label><button class="button" id="save">${visit ? "Сохранить новое фото" : "Мы нашли суслика! ✦"}</button>${visit ? '<button class="secondary" id="remove">Убрать отметку и фото</button>' : ""}</div><p class="fine">Можно выбрать фото или камеру через меню телефона. Геолокация не проверяется. Фото не отправляется на сервер.</p>`;
   $("#detail-title").textContent = p.name;
   $("#mission-text").textContent = missions[p.id];
+  $("#talk-again").onclick = () => {
+    if (!busy)
+      playDialogue(guardianDialogue(p.id, records.has(p.id)), {
+        completeLabel: "Вернуться к карточке",
+      });
+  };
   mountSprite(p.id, $(".detail-hero"));
   if (visit) {
     $(".detail-photo").src = visit.photo;
@@ -266,7 +306,8 @@ async function saveVisit() {
     return;
   }
   const point = selected,
-    before = records.size;
+    before = records.size,
+    isNew = !records.has(point.id);
   setBusy(true);
   $("#message").textContent = "Сохраняем вашу встречу…";
   try {
@@ -295,6 +336,16 @@ async function saveVisit() {
         $("#detail-content").append(box);
         box.scrollIntoView({ block: "nearest" });
         toast(`Новая награда: ${reward.title}!`);
+      }
+      if (isNew) {
+        const backToCity = await playDialogue(
+          rescueDialogue(point.id, reward),
+          { completeLabel: "Вернуться в город ✦" },
+        );
+        if (backToCity && selected === point && $("#detail").open) {
+          $("#detail").close();
+          $("#world").scrollIntoView({ block: "start" });
+        }
       }
     }
   } catch (error) {
@@ -341,6 +392,7 @@ $("#welcome-start").onclick = () => {
   render();
   if (!saved)
     toast("Название команды не сохранилось: хранилище браузера недоступно.");
+  if (!introSeen && records.size === 0) playIntro();
 };
 $("#help-open").onclick = showWelcome;
 $("#team-edit").onclick = showWelcome;
@@ -363,6 +415,7 @@ for (const button of document.querySelectorAll("[data-filter]"))
     render();
   };
 for (const dialog of document.querySelectorAll("dialog")) {
+  if (dialog.id === "dialogue") continue;
   dialog.querySelector(".close").onclick = () => dialog.close();
   dialog.addEventListener("close", () => {
     if (dialog.id === "detail") clearPreview();
@@ -443,6 +496,7 @@ $("#import").onchange = async () => {
     if (!confirmed) return;
     await mergeRecords(backup.visits);
     records = await loadVisits();
+    storageReady = true;
     team = backup.team;
     saveSetting("team", team);
     saveSetting("welcomed", "yes");

@@ -1263,3 +1263,412 @@ body.modal-open {
   transform: translateX(-50%);
   mix-blend-mode: multiply;
 }
+/* Playable panorama and RPG conversations */
+.world-hero {
+  display: block;
+  padding: 28px 0 35px;
+}
+.world-hero .hero-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 24px;
+}
+.world-hero h1 {
+  font-size: 32px;
+  letter-spacing: -1.2px;
+  margin: 12px 0;
+}
+.world-hero p {
+  max-width: 650px;
+  font-size: 13px;
+}
+.world-actions {
+  flex: 0 0 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.world-actions .button {
+  margin: 0;
+  font-size: 12px;
+}
+.world-actions .text-button {
+  text-align: center;
+}
+.world-hero .city-wrap {
+  border-radius: 20px;
+  background: #ecefe2;
+  border-color: #ccd8c4;
+  box-shadow: 0 12px 45px #244b3e0d;
+}
+.city-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #789677 #e0e8d8;
+}
+.world-hero .city {
+  width: 100%;
+  min-width: 720px;
+  aspect-ratio: 3/2;
+  overflow: hidden;
+  background: #9dc3c3;
+}
+.city-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+}
+.city-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(160deg, #b9c8dd80, #e0e4ef 45%, #c5d5d690),
+    repeating-linear-gradient(10deg, #dce5ea44 0 50px, #fff5 50px 90px);
+  pointer-events: none;
+  transition: opacity 0.7s;
+  backdrop-filter: saturate(0.55);
+}
+.world-hero .city-point {
+  width: 44px;
+  height: 48px;
+  border-radius: 10px;
+  border: 2px solid #d8e6cf;
+  background: #234638;
+  box-shadow:
+    0 4px 0 #122b25aa,
+    0 0 0 4px #ffffff25;
+  color: #f5ecd6;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+.world-hero .city-point.found {
+  background: #f2cd78;
+  border-color: #fff2bf;
+  box-shadow:
+    0 4px 0 #90794099,
+    0 0 17px #fff0aacc;
+  color: #334934;
+}
+.point-symbol {
+  font-size: 19px;
+  line-height: 1;
+}
+.point-number {
+  font-size: 9px;
+  line-height: 1;
+}
+.point-label {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 160px;
+  background: #fff8e8;
+  color: #244b3e;
+  padding: 8px 10px;
+  border-radius: 7px;
+  box-shadow: 0 4px 16px #0002;
+  font-size: 11px;
+  text-transform: capitalize;
+  pointer-events: none;
+}
+.city-point:hover .point-label,
+.city-point:focus-visible .point-label {
+  display: block;
+}
+.world-hero .city-resident {
+  bottom: 12%;
+  z-index: 1;
+}
+.world-legend {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 15px 18px 8px;
+  font-size: 10px;
+  color: #54634d;
+}
+.world-legend span {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  background: #244b3e;
+  border-radius: 3px;
+}
+.legend-dot.rescued {
+  background: #e5b960;
+}
+.world-legend .pan-hint {
+  margin-left: auto;
+  display: none;
+}
+.world-hero .city-caption {
+  font-size: 10px !important;
+  padding: 4px 18px 15px;
+}
+.dialogue {
+  max-width: 780px;
+  width: calc(100% - 28px);
+  border: 3px solid #78936a;
+  box-shadow:
+    0 0 0 4px #e6ead2,
+    0 18px 100px #0b261b55;
+  border-radius: 15px;
+  background: #fbf6e7;
+  padding: 25px 30px 18px;
+}
+.dialogue::backdrop {
+  background: #102c23aa;
+  backdrop-filter: blur(3px);
+}
+.dialogue .close {
+  background: #fbf6e7;
+  color: #46613d;
+}
+.dialogue-top {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+  padding-right: 32px;
+  color: #70835e;
+}
+.dialogue-top .eyebrow {
+  font-size: 9px;
+}
+#dialogue-step {
+  font-size: 10px;
+}
+.dialogue-body {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  min-height: 175px;
+  margin: 18px 0;
+}
+.dialogue-portrait {
+  width: 110px;
+  height: 150px;
+  flex: 0 0 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff8e9;
+  border: 1px solid #e7e1ca;
+  border-radius: 12px;
+}
+.dialogue-portrait .sprite {
+  height: auto;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.dialogue-copy {
+  flex: 1;
+  min-width: 0;
+}
+.dialogue-copy h2 {
+  font-size: 21px;
+  text-transform: capitalize;
+  margin: 0 0 12px;
+  color: #244b3e;
+  outline: none;
+}
+#dialogue-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #445541;
+  margin: 0;
+}
+.dialogue-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.dialogue-actions .button {
+  margin: 0;
+}
+.dialogue-choice {
+  font: inherit;
+  background: #ebeddb;
+  border: 1px solid #b9c7a8;
+  color: #2f4f39;
+  border-radius: 10px;
+  padding: 13px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+.dialogue-choice:hover {
+  background: #dfe6ce;
+}
+.dialogue .text-button {
+  display: block;
+  margin-top: 12px;
+  color: #77866b;
+  font-size: 10px;
+}
+.story-emblem {
+  font-size: 55px;
+  color: #d5af66;
+}
+.fog-character {
+  width: 76px;
+  height: 54px;
+  background: #a7baca;
+  position: relative;
+  box-shadow:
+    -9px 9px #a7baca,
+    9px 9px #a7baca,
+    0 -9px #a7baca,
+    0 18px #a7baca;
+  image-rendering: pixelated;
+}
+.fog-character::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 18px;
+  width: 7px;
+  height: 9px;
+  background: #385867;
+  box-shadow: 34px 0 #385867;
+}
+.fog-character::after {
+  content: "";
+  position: absolute;
+  left: 31px;
+  top: 38px;
+  width: 15px;
+  height: 4px;
+  background: #385867;
+}
+.dialogue[data-speaker="fog"] {
+  border-color: #819da9;
+}
+.talk-button {
+  width: 100%;
+  margin: 0 0 12px !important;
+}
+.card-bottom .talk-label {
+  font-weight: 800;
+}
+@media (max-width: 740px) {
+  .world-legend .pan-hint {
+    display: flex;
+  }
+  .world-hero .hero-copy {
+    display: block;
+  }
+  .world-actions {
+    flex: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    margin-top: 18px;
+  }
+  .world-actions .text-button {
+    font-size: 10px;
+  }
+  .world-hero h1 {
+    font-size: 29px;
+  }
+  .world-hero .city {
+    width: 720px;
+  }
+  .world-hero .city-point {
+    width: 44px;
+    height: 48px;
+  }
+  .dialogue {
+    padding: 22px 18px 14px;
+    max-height: 85dvh;
+  }
+  .dialogue-body {
+    gap: 14px;
+    margin: 18px 0;
+    align-items: flex-start;
+    min-height: 150px;
+  }
+  .dialogue-portrait {
+    width: 75px;
+    height: 110px;
+    flex-basis: 75px;
+  }
+  .dialogue-copy h2 {
+    font-size: 18px;
+  }
+  #dialogue-text {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .dialogue-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dialogue-choice {
+    font-size: 12px;
+    padding: 13px 12px;
+  }
+  .dialogue-actions .button {
+    font-size: 12px;
+  }
+  .fog-character {
+    transform: scale(0.75);
+  }
+  .dialogue-top .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+  .dialogue .close {
+    width: 30px;
+    height: 30px;
+    top: 8px;
+    right: 8px;
+  }
+  .world-hero {
+    padding: 25px 0 30px;
+  }
+  .world-hero .city-label {
+    font-size: 8px;
+    letter-spacing: 0.6px;
+  }
+  .world-hero .city-caption {
+    font-size: 9px !important;
+  }
+  .world-legend {
+    font-size: 9px;
+    gap: 14px;
+  }
+  .world-legend .pan-hint {
+    font-size: 9px;
+  }
+  .world-hero .hero-copy {
+    margin-bottom: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .city-fog {
+    transition: none;
+  }
+}

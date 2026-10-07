@@ -24,31 +24,39 @@
       Вы офлайн. Коллекция и фото доступны; для внешних карт нужен интернет.
     </div>
     <main>
-      <section class="hero">
+      <section class="hero world-hero" id="world">
         <div class="hero-copy">
-          <div class="eyebrow">ПРОГУЛКА, КОТОРАЯ СТАНЕТ ИСТОРИЕЙ</div>
-          <h1>Разбудите<br />маленький город.</h1>
-          <p>
-            Туман Забывайка перепутал воспоминания Красноярска. Найдите
-            бронзовых сусликов — и помогите городу снова засиять.
-          </p>
-          <a class="button" href="#collection"
-            >Выбрать первого хранителя <span>↗</span></a
-          >
-          <div class="hero-notes">
-            <span>24 встречи</span><span>Первая победа — за 5</span
-            ><span>Без регистрации</span>
+          <div>
+            <div class="eyebrow">ВАША СЕМЬЯ · ВАШЕ ПРИКЛЮЧЕНИЕ</div>
+            <h1>Красноярск ждёт своих хранителей.</h1>
+            <p>
+              Выберите точку в городе, поговорите с сусликом и помогите ему
+              выбраться из тумана.
+            </p>
+          </div>
+          <div class="world-actions">
+            <button class="button" id="story-start">Начать историю ✦</button
+            ><a class="text-button" href="#collection"
+              >Открыть всех хранителей</a
+            >
           </div>
         </div>
         <div class="city-wrap">
           <div class="city-label">
-            <span>ВАШ КРАСНОЯРСК</span
+            <span>КРАСНОЯРСК · ГОРОД ВОСПОМИНАНИЙ</span
             ><span id="city-weather">Туман над городом</span>
           </div>
-          <div id="city" class="city" role="group"></div>
+          <div class="city-scroll" id="city-scroll">
+            <div id="city" class="city" role="group"></div>
+          </div>
+          <div class="world-legend">
+            <span><i class="legend-dot"></i>В тумане</span
+            ><span><i class="legend-dot rescued"></i>Спасён</span
+            ><span class="pan-hint">↔ Листайте панораму</span>
+          </div>
           <p class="city-caption">
-            Каждая встреча зажигает окна. Нажмите на номер домика, чтобы
-            познакомиться с хранителем. Сцена не является картой.
+            Нажмите на точку, чтобы поговорить. Это художественный мир игры —
+            настоящие координаты и карты находятся в карточке хранителя.
           </p>
         </div>
       </section>
@@ -202,8 +210,8 @@
       ><span class="eyebrow">ДОБРО ПОЖАЛОВАТЬ В ПРИКЛЮЧЕНИЕ</span>
       <h2 id="welcome-title">У города есть маленькие хранители</h2>
       <p>
-        Забывайка потерял собственные воспоминания и окутал город туманом.
-        Соберите альбом встреч, чтобы напомнить ему, сколько здесь доброго.
+        Назовите вашу команду — и начните историю. Чтец расскажет, что случилось
+        в городе и как помочь его маленьким хранителям.
       </p>
       <ol>
         <li>Выберите суслика и откройте его точку в картах.</li>
@@ -231,6 +239,35 @@
       <h2 id="notice-title"></h2>
       <p id="notice-text"></p>
       <div id="notice-actions" class="detail-actions"></div>
+    </dialog>
+    <dialog
+      id="dialogue"
+      class="dialogue"
+      aria-labelledby="dialogue-speaker"
+      aria-describedby="dialogue-text"
+    >
+      <button id="dialogue-close" class="close" aria-label="Закрыть разговор">
+        ×
+      </button>
+      <div class="dialogue-top">
+        <span class="eyebrow">ГОРОД ВОСПОМИНАНИЙ</span
+        ><span id="dialogue-step"></span>
+      </div>
+      <div class="dialogue-body">
+        <div
+          id="dialogue-portrait"
+          class="dialogue-portrait"
+          aria-hidden="true"
+        ></div>
+        <div class="dialogue-copy">
+          <h2 id="dialogue-speaker" tabindex="-1"></h2>
+          <p id="dialogue-text" aria-live="polite"></p>
+        </div>
+      </div>
+      <div id="dialogue-actions" class="dialogue-actions"></div>
+      <button id="dialogue-skip" class="text-button">
+        Пропустить разговор
+      </button>
     </dialog>
     <div id="toast" role="status" hidden></div>
     <script type="module" src="app.js"></script>
